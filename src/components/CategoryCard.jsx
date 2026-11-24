@@ -3,7 +3,7 @@ import { categoryName, useI18n } from '../lib/i18n.js'
 import { CATEGORY_EMOJI } from './icons.jsx'
 import ShoppingItem from './ShoppingItem.jsx'
 
-export default function CategoryCard({ category, items, forceOpen, onToggleCategory, onToggleItem, onDeleteItem, onAddItem }) {
+export default function CategoryCard({ category, items, forceOpen, onToggleCategory, onToggleItem, onDeleteItem, onAddItem, onMoveCategory, categoryOrder, reorderDisabled }) {
   const [newItem, setNewItem] = useState('')
   const { lang, t } = useI18n()
   const name = categoryName(category, lang)
@@ -20,7 +20,12 @@ export default function CategoryCard({ category, items, forceOpen, onToggleCateg
   }
 
   return (
-    <section className="category" aria-labelledby={`${panelId}-title`}>
+    <section className="category" data-category-id={category.id} aria-labelledby={`${panelId}-title`}>
+      {!reorderDisabled && <button className="category__drag" type="button" aria-label={lang === 'fr' ? `Déplacer ${name} (flèches haut et bas)` : `حرّك ${name} بالسهم الفوقاني والتحتاني`} title={lang === 'fr' ? 'Déplacer la catégorie' : 'حرّك المجموعة'}
+        onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); event.currentTarget.dataset.dragging = 'true' }}
+        onPointerUp={(event) => { if (event.currentTarget.dataset.dragging) { delete event.currentTarget.dataset.dragging; const target = document.elementFromPoint(event.clientX, event.clientY)?.closest('[data-category-id]'); onMoveCategory(category.id, target?.dataset.categoryId) } }}
+        onPointerCancel={(event) => { delete event.currentTarget.dataset.dragging }}
+        onKeyDown={(event) => { const delta = event.key === 'ArrowUp' ? -1 : event.key === 'ArrowDown' ? 1 : 0; if (delta) { event.preventDefault(); onMoveCategory(category.id, categoryOrder[categoryOrder.indexOf(category.id) + delta]) } }}>⠿</button>}
       <button className="category__toggle" type="button" aria-expanded={isOpen} aria-controls={`${panelId}-body`} onClick={() => onToggleCategory(category.id)}>
         <span className="category__icon" aria-hidden="true">{CATEGORY_EMOJI[category.id] ?? '🧺'}</span>
         <span className="category__name" id={`${panelId}-title`}>{name}</span>

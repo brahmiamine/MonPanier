@@ -52,5 +52,12 @@ export function mergeLists(base, local, remote) {
       if (removed.size) resultCategory.items = resultCategory.items.filter((item) => !removed.has(item.id))
     }
   }
+  // Un changement local d'ordre est conservé même si une autre modification est arrivée entre-temps.
+  const baseOrder = (base || []).map((category) => category.id).join('\0')
+  const localOrder = local.map((category) => category.id).join('\0')
+  if (baseOrder !== localOrder) {
+    const ranks = new Map(local.map((category, index) => [category.id, index]))
+    result.sort((a, b) => (ranks.get(a.id) ?? Infinity) - (ranks.get(b.id) ?? Infinity))
+  }
   return result
 }

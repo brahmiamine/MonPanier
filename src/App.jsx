@@ -83,6 +83,18 @@ export default function App() {
     if (searchOpen) searchInputRef.current?.focus()
   }, [searchOpen])
 
+  function moveCategory(id, targetId) {
+    if (!targetId || id === targetId) return
+    setData((current) => {
+      const from = current.findIndex((c) => c.id === id)
+      const to = current.findIndex((c) => c.id === targetId)
+      if (from < 0 || to < 0) return current
+      const next = [...current]
+      next.splice(to, 0, next.splice(from, 1)[0])
+      return next
+    })
+  }
+
   function updateItem(categoryId, itemId, updater) {
     setData((current) => current.map((category) => category.id !== categoryId
       ? category
@@ -199,7 +211,7 @@ export default function App() {
       <main className="content" id="shopping-panel">
         {activeView === 'list' ? (
           visibleCategories.length > 0 ? visibleCategories.map(({ category, items, forceOpen }) => (
-            <CategoryCard key={category.id} category={category} items={items} forceOpen={forceOpen} onToggleCategory={toggleCategory} onToggleItem={toggleItem} onDeleteItem={deleteItem} onAddItem={addItem} />
+            <CategoryCard key={category.id} onMoveCategory={moveCategory} categoryOrder={data.map((c) => c.id)} reorderDisabled={Boolean(searchQuery.trim())} category={category} items={items} forceOpen={forceOpen} onToggleCategory={toggleCategory} onToggleItem={toggleItem} onDeleteItem={deleteItem} onAddItem={addItem} />
           )) : (
             <div className="empty-state"><span className="empty-state__icon" aria-hidden="true">🔎</span><h2>{t.noResult}</h2><p>{t.tryOther}</p></div>
           )

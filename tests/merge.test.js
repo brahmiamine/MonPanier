@@ -59,3 +59,15 @@ test('la fusion ne modifie pas ses arguments', () => {
   mergeLists(base, local, remote)
   assert.equal(JSON.stringify([base, local, remote]), snapshot)
 })
+
+test('un changement local d’ordre conserve les modifications distantes', () => {
+  const local = structuredClone(base).reverse()
+  const remote = structuredClone(base); remote[0].items[0].checked = true
+  const merged = mergeLists(base, local, remote)
+  assert.deepEqual(merged.map((c) => c.id), ['b', 'a'])
+  assert.equal(merged[1].items[0].checked, true)
+})
+
+test('un ordre distant est conservé si l’ordre local est inchangé', () => {
+  assert.deepEqual(mergeLists(base, structuredClone(base), structuredClone(base).reverse()).map((c) => c.id), ['b', 'a'])
+})

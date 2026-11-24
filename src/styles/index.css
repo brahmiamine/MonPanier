@@ -182,3 +182,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--focus); out
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }
+
+.category { position: relative; }
+.category__drag { position: absolute; inset-inline-end: 4px; top: 10px; width: 40px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--ink-600); font-size: 24px; cursor: grab; touch-action: none; z-index: 1; }
+.category__drag:active { cursor: grabbing; }
+.category:has(.category__drag) .category__toggle { padding-inline-end: 48px; }
